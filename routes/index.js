@@ -30,7 +30,7 @@ router.get('/auth', function (req, res) {
     response_type: 'code',
     grant_type: 'authorization_code',
     scope: 'library.read',
-    // state: state
+    state: state
   });
 
   console.log(query, `https://${apiDomain}/oauth/authorize?${query}`)
