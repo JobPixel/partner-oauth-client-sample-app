@@ -20,8 +20,7 @@ Note: Your app must be running on localhost:3000, if you don't have that port av
 ## ToDo
 
 - update `clientId` and `clientSecret` in routes/index.js
-- visit `/auth` route to see the sample /authorize url -  this will redirect to jobpixel with the query string - here you have to use jobpxiel's credentials
-- which will then redirect to callback url specified in the previous step
+- visit `/auth` to see the sample /authorize url -  this will redirect to JobPixel with the query string - here you have to use the provided credentials which will then redirect to callback url specified in the previous step
 - use this authorization code to generate the access token and refresh token (authorization_code grant)
 - in case access token expires, use token api to get the new token (refresh_token grant)
 
