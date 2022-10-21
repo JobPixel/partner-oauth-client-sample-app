@@ -4,6 +4,11 @@ var express = require('express');
 const { route } = require('express/lib/application');
 var router = express.Router();
 
+axios.defaults.rejectUnauthorized = false;
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
+const apiDomain = 'api.jobpixel.com';
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -21,16 +26,16 @@ router.get('/auth', function (req, res) {
   // build query string for authorization page.
   const query = new URLSearchParams({
     client_id: clientId,
-    redirect_uri: 'http://localhost:3000/callback',
+    redirect_uri: 'http://localhost:4500/callback',
     response_type: 'code',
     grant_type: 'authorization_code',
-    scope: '*',
-    state: state
+    scope: 'library.read',
+    // state: state
   });
 
-  console.log(query, `https://api.jobpixel.com/oauth/authorize?${query}`)
+  console.log(query, `https://${apiDomain}/oauth/authorize?${query}`)
 
-  res.redirect(301, `https://api.jobpixel.com/oauth/authorize?${query}`);
+  res.redirect(302, `https://${apiDomain}/oauth/authorize?${query}`);
 });
 
 router.get('/callback', async function(req, res) {
@@ -42,14 +47,15 @@ router.get('/callback', async function(req, res) {
     grant_type: 'authorization_code',
     client_id: clientId,
     client_secret: clientSecret,
-    redirect_uri: 'http://localhost:3000/callback',
-    code: req.query.code
+    redirect_uri: 'http://localhost:4500/callback',
+    code: req.query.code,
+    scope: 'library.read',
   };
 
-  // log form data for debuging.
+  // log form data for debugging.
   console.log(formData)
 
-  const authResponse = await axios.post('https://api.jobpixel.com/oauth/token', formData);
+  const authResponse = await axios.post(`https://${apiDomain}/oauth/token`, formData);
 
   accessToken = authResponse.data.access_token
   refreshToken = authResponse.data.refresh_token
@@ -69,7 +75,7 @@ router.get('/refresh-access-token', async function (req, res) {
     refresh_token: refreshToken
   }
 
-  const refreshResponse = await axios.post('https://api.jobpixel.com/oauth/token', formData);
+  const refreshResponse = await axios.post(`https://${apiDomain}/oauth/token`, formData);
 
   accessToken = refreshResponse.data.access_token
   refreshToken = refreshResponse.data.refresh_token
@@ -82,7 +88,7 @@ router.get('/refresh-access-token', async function (req, res) {
 });
 
 router.get('/videos', async function (req, res) {
-  const endpoint = 'https://api.jobpixel.com/api/partners/v1/library/media/videos';
+  const endpoint = `https://${apiDomain}/api/partners/v1/library/media/videos`;
 
   const videoResponse = await axios.get(endpoint, {
     headers: {
